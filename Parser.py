@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #-----------------------------------------------------------------------------
-# Name: Parser.py
+# Name: self.py
 # Purpose: Scrape latest movies off IMDB and get average age of the actors
 #
 # Author: Matthew Sylvia (msylvia@nukefile.net)
@@ -18,40 +18,62 @@ class Parser:
     'Information about a Movie'
 
     list = {}
+    cached = {}
 
     # =========================================================
-    def __default(val):
+    def __default(self, val):
         return val
 
     # =========================================================
-    def Add(self, key, template, vars, xpath, callback=__default):
-        Parser.list[key] = {
+    def Add(self, key, template, xpath, callback=__default):
+        self.list[key] = {
             'url_template': template,
-            'url_vars': vars,
             'xpath': xpath,
             'callback': callback,
             'value': None
         }
 
     # =========================================================
-    def Process(self, key):
-        # Build URL
-        url = Parser.list[key]['url_template'].format(
-            Parser.list[key]['url_vars'])
+    def Remove(self, key):
+        if (key in self.list):
+            del self.list[key]
 
-        # Make Request
-        page = requests.get(url)
-        tree = html.fromstring(page.text)
+    # =========================================================
+    def Clear(self):
+        self.list.Clear()
+
+    # =========================================================
+    def Run(self, key, vars):
+        if (key not in self.list) or (vars is None):
+            print key, " Not found"
+            return
+
+        # Build URL
+        url = self.list[key]['url_template'].format(vars)
+
+        tree = None
+
+        # Check cache so we dont need to download the page again
+        if url not in self.cached:
+            # Make Request
+            page = requests.get(url)
+            tree = html.fromstring(page.text)
+
+            self.cached[url] = tree
+        # Already cached
+        else:
+            print url, " Already cached"
+            tree = self.cached[url]
 
         # Parse
-        rawValues = tree.xpath(Parser.list[key]['xpath'])
+        rawValues = tree.xpath(self.list[key]['xpath'])
 
         # PostProcess if nessary
-        Parser.list[key]['value'] = Parser.list[key]['callback'](rawValues)
+        self.list[key]['value'] = self.list[key]['callback'](self, rawValues)
 
     # =========================================================
     def Get(self, key):
-        return Parser.list[key]['value']
+        return self.list[key]['value']
 
     # =========================================================
     def PostProcess(self, value):

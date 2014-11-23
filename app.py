@@ -14,40 +14,57 @@ from MovieParser import *
 from IMDBParser import *
 
 if __name__ == "__main__":
-    # parser = MovieParser()
-    # print parser.GetMovies('01606', 2)
 
-    # # Print everyone
-    # for movieid, movie in parser.moviesList.items():
-    #     for actorid in movie.actorIDs:
-    #         print parser.actorsList[actorid]
-
-    parser = IMDBParser()
-    parser.Add('movieTitles',
-               'http://www.imdb.com/showtimes/location/US/{0}?sort=alpha',
-               ['01606'],
-               '//*[@class="title"]/a/text()'
-               )
-
-    parser.Process('movieTitles')
-    print parser.Get('movieTitles')
-
-    parser.Add('movieIDs',
-               'http://www.imdb.com/showtimes/location/US/{0}?sort=alpha',
-               ['01606'],
-               '//*[@class="title"]/a',
-               parser.PostProcessMovieTitle)
-
-    parser.Process('movieIDs')
-    print parser.Get('movieIDs')
-
-    parser.Add('actorNames',
-               'http://www.imdb.com/title/{0}/fullcredits',
-               'tt0365907',
-               '//*[@itemprop="actor"]/a',
-               parser.PostProcessActorName)
-
-    parser.Process('actorNames')
-    print parser.Get('actorNames')
+    parser = MovieParser(IMDBParser())
+    print parser.GetMovies('01606', 1)
 
 
+    # parser = IMDBParser()
+    # parser.Run('movie_title', ['01606'])
+    # parser.Run('movie_title', ['01606'])
+    # print parser.Get('movie_title')
+
+    #-----------------------------
+    # parser.Add('movieNames',
+    #            'http://www.imdb.com/showtimes/location/US/{0}?sort=alpha',
+    #            ['01606'],
+    #            '//*[@class="title"]/a/text()'
+    #            )
+    # parser.Process('movieNames')
+    # print parser.Get('movieNames')
+
+    # #-----------------------------
+    # parser.Add('movieIDs',
+    #            'http://www.imdb.com/showtimes/location/US/{0}?sort=alpha',
+    #            ['01606'],
+    #            '//*[@class="title"]/a',
+    #            parser.PostProcessMovieTitle)
+    # parser.Process('movieIDs')
+    # print parser.Get('movieIDs')
+
+    # #-----------------------------
+    # parser.Add('actorNames',
+    #            'http://www.imdb.com/title/{0}/fullcredits',
+    #            'tt0365907',
+    #            '//*[@itemprop="actor"]/a',
+    #            parser.PostProcessActorName)
+    # parser.Process('actorNames')
+    # print parser.Get('actorNames')
+
+    # #-----------------------------
+    # parser.Add('actorIDs',
+    #            'http://www.imdb.com/title/{0}/fullcredits',
+    #            'tt0365907',
+    #            '//*[@itemprop="actor"]/a',
+    #            parser.PostProcessActorID)
+    # parser.Process('actorIDs')
+    # actorIDS = parser.Get('actorIDs')
+
+    # for x in actorIDS:
+    #     parser.Add('actorAge',
+    #                'http://www.imdb.com/name/{0}/',
+    #                x,
+    #                '//*[@id="name-born-info"]/time',
+    #                parser.PostProcessActorBirthday)
+    #     parser.Process('actorAge')
+    #     print parser.Get('actorAge')
