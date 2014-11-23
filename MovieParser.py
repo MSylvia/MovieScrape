@@ -29,7 +29,36 @@ class MovieParser:
     def GetMovies(self, zipcode, num=0):
         self.parser.Run('movie_title', zipcode)
         self.parser.Run('movie_id', zipcode)
+
+    # Get actors based on movie id
+    #=============================
+    def GetActors(self, movieID):
+        self.parser.Run('actor_name', movieID)
+        self.parser.Run('actor_id', movieID)
+
+    # Get age based on actor id
+    #=============================
+    def GetAge(self, actorID):
+        self.parser.Run('actor_age', actorID)
+
+    # Print debug messages
+    #=============================
+    def PrintMovieTitles(self):
         return self.parser.Get('movie_title')
+
+    def PrintMovieIDs(self):
+        return self.parser.Get('movie_id')
+
+    def PrintActorNames(self):
+        return self.parser.Get('actor_name')
+
+    def PrintActorIDs(self):
+        return self.parser.Get('actor_id')
+
+    def PrintActorAges(self):
+        return self.parser.Get('actor_age')
+
+
 
 # # Get movies based on zipcode
 # #=============================

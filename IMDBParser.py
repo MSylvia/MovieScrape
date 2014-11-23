@@ -18,40 +18,38 @@ class IMDBParser(Parser):
     'Information about a Movie'
 
     # =========================================================
-    def PostProcessMovieID(self, list):
+    def PostProcess_MovieID(self, list):
         data = []
         for item in list:
             data.append(item.attrib['href'].split('/')[3])
         return data
 
     # =========================================================
-    def PostProcessActorName(self, list):
+    def PostProcess_ActorName(self, list):
         data = []
         for item in list:
             data.append(item.find('span').text)
         return data
 
     # =========================================================
-    def PostProcessActorID(self, list):
+    def PostProcess_ActorID(self, list):
         data = []
         for item in list:
             data.append(item.attrib['href'].split('/')[2])
         return data
 
     # =========================================================
-    def PostProcessActorBirthday(self, list):
+    def PostProcess_ActorBirthdate(self, list):
         data = []
         for item in list:
             raw = item.attrib['datetime']
             template = "%Y-%m-%d"
-
-            data.append(
-                self.calculate_age(datetime.strptime(raw, template))
-                )
+            age = self.Calculate_Age(datetime.strptime(raw, template))
+            data.append(age)
         return data
 
     # =========================================================
-    def calculate_age(self, born):
+    def Calculate_Age(self, born):
         today = date.today()
         return today.year - born.year - (
             (today.month, today.day) < (born.month, born.day))
@@ -66,21 +64,21 @@ class IMDBParser(Parser):
         self.Add('movie_id',
                  'http://www.imdb.com/showtimes/location/US/{0}?sort=alpha',
                  '//*[@class="title"]/a',
-                 IMDBParser.PostProcessMovieID)
+                 IMDBParser.PostProcess_MovieID)
         # Actor Name
         self.Add('actor_name',
                  'http://www.imdb.com/title/{0}/fullcredits',
                  '//*[@itemprop="actor"]/a',
-                 IMDBParser.PostProcessActorName)
+                 IMDBParser.PostProcess_ActorName)
         # Actor ID
         self.Add('actor_id',
                  'http://www.imdb.com/title/{0}/fullcredits',
                  '//*[@itemprop="actor"]/a',
-                 IMDBParser.PostProcessActorID)
+                 IMDBParser.PostProcess_ActorID)
         # Actor Age
         self.Add('actor_age',
                  'http://www.imdb.com/name/{0}/',
                  '//*[@id="name-born-info"]/time',
-                 IMDBParser.PostProcessActorBirthday)
+                 IMDBParser.PostProcess_ActorBirthdate)
     #-----------------------------
-        print self.list
+        #print self.list
