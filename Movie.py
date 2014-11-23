@@ -1,3 +1,15 @@
+#!/usr/bin/python
+#-----------------------------------------------------------------------------
+# Name: Movie.py
+# Purpose: Scrape latest movies off IMDB and get average age of the actors
+#
+# Author: Matthew Sylvia (msylvia@nukefile.net)
+#
+# Created: 11/22/2014
+# Copyright: (c) 2014 Matthew Sylvia
+# Licence: MIT
+#-----------------------------------------------------------------------------
+
 
 class Movie:
     'Information about a Movie'

@@ -1,4 +1,14 @@
 #!/usr/bin/python
+#-----------------------------------------------------------------------------
+# Name: MovieParser.py
+# Purpose: Scrape latest movies off IMDB and get average age of the actors
+#
+# Author: Matthew Sylvia (msylvia@nukefile.net)
+#
+# Created: 11/22/2014
+# Copyright: (c) 2014 Matthew Sylvia
+# Licence: MIT
+#-----------------------------------------------------------------------------
 
 from lxml import html
 import requests
@@ -63,8 +73,6 @@ class MovieParser:
         tree = html.fromstring(page.text)
 
         rawActorsElem = tree.xpath('//*[@itemprop="actor"]/a')
-
-        # print len(rawActorsElem)
 
         for actorElem in rawActorsElem:
             # Get parsed values
