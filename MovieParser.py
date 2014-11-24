@@ -1,7 +1,15 @@
 #!/usr/bin/python
+#-----------------------------------------------------------------------------
+# Name: MovieParser.py
+# Purpose: Scrape latest movies off IMDB and get average age of the actors
+#
+# Author: Matthew Sylvia (msylvia@nukefile.net)
+#
+# Created: 11/22/2014
+# Copyright: (c) 2014 Matthew Sylvia
+# Licence: MIT
+#-----------------------------------------------------------------------------
 
-from lxml import html
-import requests
 from Movie import *
 from Actor import *
 
@@ -11,74 +19,123 @@ class MovieParser:
 
     actorsList = {}
     moviesList = {}
+    zipcodeList = {}
 
-    # Get movies based on zipcode
+    parser = None
+
+    # ---------------------------------------------------------
+    def __init__(self, parser):
+    # ---------------------------------------------------------
+        self.parser = parser
+
+    # Based on Data
     #=============================
-    def GetMovies(self, zipcode, num=0):
+    # ---------------------------------------------------------
+    def GetMovies(self, zipcode):
+    # ---------------------------------------------------------
+        self.CreateMovies(zipcode)
+        return [self.moviesList[x] for x in self.zipcodeList[zipcode]]
 
-        template = 'http://www.imdb.com/showtimes/location/US/{0}?sort=alpha'
+    # ---------------------------------------------------------
+    def GetMovie(self, movieID):
+    # ---------------------------------------------------------
+        return self.moviesList[movieID]
 
-        movieIDs = []
+    # ---------------------------------------------------------
+    def CreateMovies(self, zipcode):
+    # ---------------------------------------------------------
+        zipcode = zipcode.encode('utf-8')
 
-        url = template.format(zipcode)
+        if zipcode in self.zipcodeList:
+            return
 
-        page = requests.get(url)
-        tree = html.fromstring(page.text)
+        ids = self.GetMovieIDs(zipcode)
+        titles = self.GetMovieTitles(zipcode)
 
-        # List of movie names
-        rawTitles = tree.xpath('//*[@class="title"]/a/text()')
-        # Actors
-        rawLinks = tree.xpath('//*[@class="title"]/a')
+        self.zipcodeList[zipcode] = ids
 
-        index = num
+        for title, id in zip(titles, ids):
+            self.CreateMovie(title, id)
 
-        for title, link in zip(rawTitles, rawLinks):
-            # Check to make sure we care
-            if index > 0 and num != 0:
-                # Get parsed values
-                movie_ID = link.attrib['href'].split('/')[3]
+        result = [self.moviesList[x] for x in self.zipcodeList[zipcode]]
+        return ''.join(map(str, result))
 
-                # Add to global List
-                if movie_ID in MovieParser.moviesList:
-                    print 'Movie Already Seen'
-                else:
-                    MovieParser.moviesList[movie_ID] = Movie(
-                        title, movie_ID, MovieParser.GetActors(self, movie_ID))
-                    movieIDs.append(movie_ID)
+    # ---------------------------------------------------------
+    def CreateMovie(self, title, movieID):
+    # ---------------------------------------------------------
+        if movieID in self.moviesList:
+            return
+            #print 'Movie Already Seen ', movieID
+        else:
+            self.CreateActors(movieID)
+            self.moviesList[movieID] = Movie(title,
+                                             movieID,
+                                             self.GetActorIDs(movieID))
 
-            if num != 0:
-                index -= 1
+    # ---------------------------------------------------------
+    def CreateActors(self, movieID):
+    # ---------------------------------------------------------
+        names = self.GetActorNames(movieID)
+        ids = self.GetActorIDs(movieID)
 
-        return movieIDs
+        for name, id in zip(names, ids):
+            self.CreateActor(name, id, movieID)
 
-    # Get actors based on movie id
+    # ---------------------------------------------------------
+    def CreateActor(self, name, id, movieID):
+    # ---------------------------------------------------------
+        if id in self.actorsList:
+            return
+            #print 'Actor Already Seen ', id
+        else:
+            self.actorsList[id] = Actor(name, id, [movieID])
+
+    # ---------------------------------------------------------
+    def SetAges(self, movieID):
+    # ---------------------------------------------------------
+        actorIDs = self.moviesList[movieID].actorIDs
+
+        numberOfAges = 0
+        total = 0
+
+        for actorID in actorIDs:
+            age = self.GetAge(actorID)
+            if age > 0:
+                numberOfAges += 1
+                total += age
+
+            self.actorsList[actorID].age = age
+
+        self.moviesList[movieID].average = total / numberOfAges
+
+    # Based on parsing
     #=============================
-    def GetActors(self, movieID):
+    # ---------------------------------------------------------
+    def GetMovieTitles(self, zipcode):
+    # ---------------------------------------------------------
+        #print 'GetMovieTitles', zipcode
+        return self.parser.Run('movie_title', zipcode)
 
-        titleURLFormat = 'http://www.imdb.com/title/{0}/fullcredits'
+    # ---------------------------------------------------------
+    def GetMovieIDs(self, zipcode):
+    # ---------------------------------------------------------
+        #print 'GetMovieIDs', zipcode
+        return self.parser.Run('movie_id', zipcode)
 
-        actorIDs = []
+    # ---------------------------------------------------------
+    def GetActorNames(self, movieID):
+    # ---------------------------------------------------------
+        #print 'GetActorNames', movieID
+        return self.parser.Run('actor_name', movieID)
 
-        page = requests.get(titleURLFormat.format(movieID))
-        tree = html.fromstring(page.text)
+    # ---------------------------------------------------------
+    def GetActorIDs(self, movieID):
+    # ---------------------------------------------------------
+        #print 'GetActorIDs', movieID
+        return self.parser.Run('actor_id', movieID)
 
-        rawActorsElem = tree.xpath('//*[@itemprop="actor"]/a')
-
-        # print len(rawActorsElem)
-
-        for actorElem in rawActorsElem:
-            # Get parsed values
-            actor_name = actorElem.find('span').text
-            actor_ID = actorElem.attrib['href'].split('/')[2]
-
-            # Check if actor has been seen before
-            if actor_ID in MovieParser.actorsList:
-                MovieParser.actorsList[actor_ID].movieIDs.append(movieID)
-            # New actor
-            else:
-                # Add to global List
-                MovieParser.actorsList[actor_ID] = Actor(
-                    actor_name, actor_ID, [movieID])
-                actorIDs.append(actor_ID)
-
-        return actorIDs
+    # ---------------------------------------------------------
+    def GetAge(self, actorID):
+    # ---------------------------------------------------------
+        #print 'GetAge', actorID
+        return self.parser.Run('actor_age', actorID)
