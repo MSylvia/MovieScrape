@@ -17,45 +17,55 @@ from datetime import datetime, date
 class IMDBParser(Parser):
     'Information about a Movie'
 
-    # =========================================================
+    # ---------------------------------------------------------
     def PostProcess_MovieID(self, list):
+    # ---------------------------------------------------------
         data = []
         for item in list:
             data.append(item.attrib['href'].split('/')[3])
         return data
 
-    # =========================================================
+    # ---------------------------------------------------------
     def PostProcess_ActorName(self, list):
+    # ---------------------------------------------------------
         data = []
         for item in list:
             data.append(item.find('span').text)
         return data
 
-    # =========================================================
+    # ---------------------------------------------------------
     def PostProcess_ActorID(self, list):
+    # ---------------------------------------------------------
         data = []
         for item in list:
             data.append(item.attrib['href'].split('/')[2])
         return data
 
-    # =========================================================
+    # ---------------------------------------------------------
     def PostProcess_ActorBirthdate(self, list):
+    # ---------------------------------------------------------
         data = []
         for item in list:
             raw = item.attrib['datetime']
             template = "%Y-%m-%d"
             age = self.Calculate_Age(datetime.strptime(raw, template))
             data.append(age)
-        return data
 
-    # =========================================================
+        age = 0
+        if len(data) != 0:
+            age = data[0]
+        return age
+
+    # ---------------------------------------------------------
     def Calculate_Age(self, born):
+    # ---------------------------------------------------------
         today = date.today()
         return today.year - born.year - (
             (today.month, today.day) < (born.month, born.day))
 
+    # ---------------------------------------------------------
     def __init__(self):
-    #-----------------------------
+    # ---------------------------------------------------------
         # Movie Title
         self.Add('movie_title',
                  'http://www.imdb.com/showtimes/location/US/{0}?sort=alpha',
@@ -80,5 +90,5 @@ class IMDBParser(Parser):
                  'http://www.imdb.com/name/{0}/',
                  '//*[@id="name-born-info"]/time',
                  IMDBParser.PostProcess_ActorBirthdate)
-    #-----------------------------
+    # ---------------------------------------------------------
         #print self.list

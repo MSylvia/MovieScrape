@@ -10,44 +10,39 @@
 # Licence: MIT
 #-----------------------------------------------------------------------------
 
+import sys
+import time
 from MovieParser import *
 from IMDBParser import *
-from flask import Flask
-app = Flask(__name__)
 
-parser = None
-
-
-@app.route("/")
-def hello():
-    return "Hello World!"
-
-
-@app.route("/<zipcode>")
-def listMovies(zipcode):
-    parser.GetMovies(zipcode, 1)
-    data = str(dict(zip(parser.PrintMovieIDs(), parser.PrintMovieTitles())))
-    return data
-
-
-@app.route("/actor/<actor_id>")
-def actor(actor_id):
-    parser.GetAge(actor_id)
-    return str(parser.PrintActorAges())
-
-
-@app.route("/movie/<movie_id>")
-def movie(movie_id):
-    parser.GetActors(movie_id)
-    return str(parser.PrintActorNames()) + str(parser.PrintActorIDs())
-
-
-@app.route("/movie/<movie_id>/full")
-def movieFull(movie_id):
-    return 'Full'
-    #parser.GetActors(movie_id)
-    #return str(parser.PrintActorNames()) + str(parser.PrintActorIDs())
-
+# ---------------------------------------------------------
 if __name__ == "__main__":
+# ---------------------------------------------------------
+    if len(sys.argv) < 2:
+        print 'Need zipcode'
+        sys.exit(0)
+
+    for arg in sys.argv:
+        print arg
+
+    # parser = MovieParser(IMDBParser())
+
+    # print '{:<13}'.format('ID'),'{:<9}'.format('Average'),'{:<70}'.format('Title')
+
+    # movies = parser.GetMovies(sys.argv[1])
+
+    # for movie in movies:
+    #     parser.SetAges(movie.ID)
+    #     print '{:<13}'.format(movie.ID),'{:<9}'.format(movie.average),'{:<70}'.format(movie.name)
+
     parser = MovieParser(IMDBParser())
-    app.run(host='0.0.0.0', debug=True)
+    print '{:<13}'.format('ID'),'{:<9}'.format('Average'),'{:<70}'.format('Title')
+    # ---------------------------------------------------------
+    start_time = time.time()
+    parser.CreateMovie('A Walk Among the Tombstones', 'tt0365907') # Cheating for time test
+    parser.SetAges('tt0365907')
+    # ---------------------------------------------------------
+    movie = parser.GetMovie('tt0365907')
+    print '{:<13}'.format(movie.ID),'{:<9}'.format(movie.average),'{:<70}'.format(movie.name)
+    print time.time() - start_time, "seconds"
+
