@@ -23,6 +23,11 @@ def siginthndlr(sig, frame):
 # ---------------------------------------------------------
 if __name__ == "__main__":
 # ---------------------------------------------------------
+    if len(sys.argv) < 2:
+        print 'Error: Zipcode required'
+        print 'Usage: python', sys.argv[0], '060210'
+        sys.exit(0)
+
     for arg in sys.argv:
         print arg
 
