@@ -74,7 +74,7 @@ class Parser:
         rawValues = tree.xpath(self.list[key]['xpath'])
 
         # PostProcess if nessary
-        self.list[key]['value'] = self.list[key]['callback'](self, rawValues)
+        return self.list[key]['callback'](self, rawValues)
 
     # ---------------------------------------------------------
     def Get(self, key):

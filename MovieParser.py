@@ -48,8 +48,6 @@ class MovieParser:
 
         if zipcode in self.zipcodeList:
             return
-            # result = [self.moviesList[x] for x in self.zipcodeList[zipcode]]
-            # return ''.join(map(str, result))
 
         ids = self.GetMovieIDs(zipcode)
         titles = self.GetMovieTitles(zipcode)
@@ -59,8 +57,8 @@ class MovieParser:
         for title, id in zip(titles, ids):
             self.CreateMovie(title, id)
 
-        # result = [self.moviesList[x] for x in self.zipcodeList[zipcode]]
-        # return ''.join(map(str, result))
+        result = [self.moviesList[x] for x in self.zipcodeList[zipcode]]
+        return ''.join(map(str, result))
 
     # ---------------------------------------------------------
     def CreateMovie(self, title, movieID):
@@ -115,57 +113,29 @@ class MovieParser:
     # ---------------------------------------------------------
     def GetMovieTitles(self, zipcode):
     # ---------------------------------------------------------
-        self.parser.Run('movie_title', zipcode)
-        return self.parser.Get('movie_title')
+        #print 'GetMovieTitles', zipcode
+        return self.parser.Run('movie_title', zipcode)
 
     # ---------------------------------------------------------
     def GetMovieIDs(self, zipcode):
     # ---------------------------------------------------------
-        self.parser.Run('movie_id', zipcode)
-        return self.parser.Get('movie_id')
+        #print 'GetMovieIDs', zipcode
+        return self.parser.Run('movie_id', zipcode)
 
     # ---------------------------------------------------------
     def GetActorNames(self, movieID):
     # ---------------------------------------------------------
-        self.parser.Run('actor_name', movieID)
-        return self.parser.Get('actor_name')
+        #print 'GetActorNames', movieID
+        return self.parser.Run('actor_name', movieID)
 
     # ---------------------------------------------------------
     def GetActorIDs(self, movieID):
     # ---------------------------------------------------------
-        self.parser.Run('actor_id', movieID)
-        return self.parser.Get('actor_id')
+        #print 'GetActorIDs', movieID
+        return self.parser.Run('actor_id', movieID)
 
     # ---------------------------------------------------------
     def GetAge(self, actorID):
     # ---------------------------------------------------------
-        self.parser.Run('actor_age', actorID)
-        age = self.parser.Get('actor_age')
-        return int(age)
-
-    # Print debug messages
-    #=============================
-    # ---------------------------------------------------------
-    def PrintMovieTitles(self):
-    # ---------------------------------------------------------
-        return self.parser.Get('movie_title')
-
-    # ---------------------------------------------------------
-    def PrintMovieIDs(self):
-    # ---------------------------------------------------------
-        return self.parser.Get('movie_id')
-
-    # ---------------------------------------------------------
-    def PrintActorNames(self):
-    # ---------------------------------------------------------
-        return self.parser.Get('actor_name')
-
-    # ---------------------------------------------------------
-    def PrintActorIDs(self):
-    # ---------------------------------------------------------
-        return self.parser.Get('actor_id')
-
-    # ---------------------------------------------------------
-    def PrintActorAges(self):
-     # ---------------------------------------------------------
-        return self.parser.Get('actor_age')
+        #print 'GetAge', actorID
+        return self.parser.Run('actor_age', actorID)

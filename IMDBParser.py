@@ -45,11 +45,14 @@ class IMDBParser(Parser):
     def PostProcess_ActorBirthdate(self, list):
     # ---------------------------------------------------------
         data = []
-        for item in list:
-            raw = item.attrib['datetime']
-            template = "%Y-%m-%d"
-            age = self.Calculate_Age(datetime.strptime(raw, template))
-            data.append(age)
+        try:
+            for item in list:
+                raw = item.attrib['datetime']
+                template = "%Y-%m-%d"
+                age = self.Calculate_Age(datetime.strptime(raw, template))
+                data.append(age)
+        except:
+            data.append(0)
 
         age = 0
         if len(data) != 0:
